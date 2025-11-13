@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Class App</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial', sans-serif; }
+    body { background: #f7f7f7; color: #333; display: flex; flex-direction: column; height: 100vh; }
+
+    header {
+      text-align: center;
+      padding: 1rem;
+      background: #fff;
+      font-size: 1.2rem;
+      font-weight: bold;
+      border-bottom: 1px solid #ddd;
+    }
+
+    main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      display: none;
+    }
+
+    main.active { display: block; }
+
+    .chapter-card {
+      background: #fff;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .chapter-card:hover { background: #f0f0f0; }
+
+    .chapter-content {
+      margin-top: 0.5rem;
+      display: none;
+      font-size: 0.95rem;
+      color: #444;
+      line-height: 1.4;
+    }
+
+    .chapter-content.open { display: block; }
+
+    /* Bottom Navigation */
+    nav {
+      display: flex;
+      justify-content: space-around;
+      background: #fff;
+      border-top: 1px solid #ddd;
+      padding: 0.5rem 0;
+    }
+
+    nav button {
+      background: none;
+      border: none;
+      outline: none;
+      flex: 1;
+      font-size: 0.9rem;
+      color: #555;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    nav button.active {
+      color: #2196f3;
+      font-weight: bold;
+    }
+
+    nav button span.icon {
+      font-size: 1.5rem;
+    }
+
+    /* Chatroom */
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 120px);
+    }
+
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      background: #fafafa;
+      padding: 0.5rem;
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+    }
+
+    .message {
+      background: #e0f7fa;
+      padding: 0.5rem;
+      border-radius: 8px;
+      margin-bottom: 0.4rem;
+      max-width: 80%;
+    }
+
+    .input-area {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .input-area input {
+      flex: 1;
+      padding: 0.6rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    .input-area button {
+      padding: 0.6rem 1rem;
+      border: none;
+      background: #2196f3;
+      color: #fff;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header id="page-title">Home</header>
+
+  <!-- Home Screen -->
+  <main id="home" class="active">
+    <div class="chapter-card" onclick="toggleChapter(1)">
+      <h3>Chapter 1: The Beginning</h3>
+      <p>Hello, I’m your teacher</p>
+      <div id="chapter1" class="chapter-content">Full Text: Hello, I’m your teacher. Welcome to this course!</div>
+    </div>
+    <div class="chapter-card" onclick="toggleChapter(2)">
+      <h3>Chapter 2: The Journey</h3>
+      <p>Fun</p>
+      <div id="chapter2" class="chapter-content">Full Text: This is the journey, full of fun and learning!</div>
+    </div>
+    <div class="chapter-card" onclick="toggleChapter(3)">
+      <h3>Chapter 3: The End</h3>
+      <p>Goodbye</p>
+      <div id="chapter3" class="chapter-content">Full Text: Goodbye and best wishes for your future!</div>
+    </div>
+  </main>
+
+  <!-- Announcements Screen -->
+  <main id="announcements">
+    <h2>Announcements</h2>
+    <p style="margin-top:1rem;">Your midterm exam is in one week!</p>
+  </main>
+
+  <!-- Chatroom Screen -->
+  <main id="chatroom">
+    <h2>Welcome to our Chatroom</h2>
+    <div class="chat-container">
+      <div class="messages" id="messages">
+        <div class="message">[Placeholder] Chat feature coming soon...</div>
+      </div>
+      <div class="input-area">
+        <input type="text" id="msgInput" placeholder="Type a message..." />
+        <button onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav>
+    <button id="nav-home" class="active" onclick="switchScreen('home')">
+      <span class="icon">🏠</span>
+      Home
+    </button>
+    <button id="nav-announcements" onclick="switchScreen('announcements')">
+      <span class="icon">📢</span>
+      Announcements
+    </button>
+    <button id="nav-chatroom" onclick="switchScreen('chatroom')">
+      <span class="icon">💬</span>
+      Chatroom
+    </button>
+  </nav>
+
+  <script type="module">
+    // Import Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+    // Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyDoZzAt-G7OMDA_A_WQC7udTtKCPRUCoTw",
+      authDomain: "classchat2025-a2d96.firebaseapp.com",
+      databaseURL: "https://classchat2025-a2d96-default-rtdb.firebaseio.com",
+      projectId: "classchat2025-a2d96",
+      storageBucket: "classchat2025-a2d96.firebasestorage.app",
+      messagingSenderId: "673495831165",
+      appId: "1:673495831165:web:bebb70d1c51a3f21d31714"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const messagesRef = ref(db, "messages");
+
+    // Switch between screens
+    window.switchScreen = function(screen) {
+      document.querySelectorAll("main").forEach(m => m.classList.remove("active"));
+      document.getElementById(screen).classList.add("active");
+
+      document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
+      document.getElementById(`nav-${screen}`).classList.add("active");
+
+      document.getElementById("page-title").innerText =
+        screen.charAt(0).toUpperCase() + screen.slice(1);
+    }
+
+    // Toggle chapter content
+    window.toggleChapter = function(num) {
+      const content = document.getElementById(`chapter${num}`);
+      content.classList.toggle("open");
+    }
+
+    // Basic Firebase chat placeholder
+    const msgInput = document.getElementById("msgInput");
+    const messagesDiv = document.getElementById("messages");
+
+    window.sendMessage = function() {
+      const text = msgInput.value.trim();
+      if (text) {
+        push(messagesRef, { text });
+        msgInput.value = "";
+      }
+    }
+
+    // Listen for new messages
+    onValue(messagesRef, snapshot => {
+      messagesDiv.innerHTML = "";
+      snapshot.forEach(child => {
+        const msg = document.createElement("div");
+        msg.className = "message";
+        msg.textContent = child.val().text;
+        messagesDiv.appendChild(msg);
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,170 +1,285 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mobile App</title>
-<style>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+  <title>Class App</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
     body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: #f5f5f5;
-        height: 100vh;
-        overflow: hidden;
+      background: #f7f7f7;
+      color: #333;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      padding-bottom: env(safe-area-inset-bottom);
     }
 
-    /* GENERAL SCREEN STYLE */
-    .screen {
-        display: none;
-        height: calc(100vh - 60px);
-        overflow-y: auto;
-        padding: 20px;
-        box-sizing: border-box;
-    }
-    .active-screen {
-        display: block;
+    header {
+      text-align: center;
+      padding: 1rem;
+      background: #fff;
+      font-size: 1.2rem;
+      font-weight: bold;
+      border-bottom: 1px solid #ddd;
+      z-index: 10;
     }
 
-    /* BOTTOM NAVIGATION */
-    .bottom-nav {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 60px;
-        background: #ffffff;
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        border-top: 1px solid #ccc;
-        z-index: 999;
-    }
-    .bottom-nav button {
-        background: none;
-        border: none;
-        font-size: 16px;
+    main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      display: none;
     }
 
-    /* --- HOME CARDS --- */
+    main.active {
+      display: block;
+    }
+
+    /* Chapter card styling */
     .chapter-card {
-        background: white;
-        padding: 15px;
-        margin-bottom: 10px;
-        border-radius: 8px;
-        box-shadow: 0px 2px 6px rgba(0,0,0,0.08);
+      background: #fff;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: 0.3s ease;
     }
 
-    /* --- CHATROOM FIXES --- */
-    #chatroom {
-        display: flex;
-        flex-direction: column;
-        height: calc(100vh - 60px);
-        overflow: hidden;
+    .chapter-card:hover {
+      background: #f0f0f0;
     }
 
-    #chatMessages {
-        flex: 1;
-        overflow-y: auto;
-        padding: 15px;
+    .chapter-content {
+      margin-top: 0.5rem;
+      display: none;
+      font-size: 0.95rem;
+      color: #444;
+      line-height: 1.4;
     }
 
-    /* Chat input box ABOVE the navigation bar */
-    .chat-input {
-        position: fixed;
-        bottom: 60px; /* sits ABOVE nav bar */
-        left: 0;
-        width: 100%;
-        background: #fff;
-        padding: 8px;
-        display: flex;
-        gap: 8px;
-        border-top: 1px solid #ddd;
-        box-sizing: border-box;
+    .chapter-content.open {
+      display: block;
     }
 
-    .chat-input input {
-        flex: 1;
-        padding: 12px;
-        border-radius: 6px;
-        border: 1px solid #ccc;
+    /* Bottom Navigation */
+    nav {
+      display: flex;
+      justify-content: space-around;
+      background: #fff;
+      border-top: 1px solid #ddd;
+      padding: 0.6rem 0;
+      padding-bottom: env(safe-area-inset-bottom);
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      z-index: 999;
     }
 
-    .chat-input button {
-        padding: 10px 16px;
-        background: #007bff;
-        color: white;
-        border: none;
-        border-radius: 6px;
+    nav button {
+      background: none;
+      border: none;
+      flex: 1;
+      font-size: 0.9rem;
+      color: #555;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      transition: 0.2s;
     }
 
-    /* Chat message styling */
+    nav button.active {
+      color: #2196f3;
+      font-weight: bold;
+    }
+
+    nav button span.icon {
+      font-size: 1.6rem;
+    }
+
+    /* Chatroom - FIXED */
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      background: #fafafa;
+      padding: 0.5rem;
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+    }
+
     .message {
-        background: #e0e0e0;
-        padding: 10px;
-        margin-bottom: 8px;
-        border-radius: 6px;
-        max-width: 75%;
+      background: #e0f7fa;
+      padding: 0.5rem;
+      border-radius: 8px;
+      margin-bottom: 0.4rem;
+      max-width: 80%;
     }
-</style>
+
+    .input-area {
+      display: flex;
+      gap: 0.5rem;
+      padding-bottom: 0.5rem;
+    }
+
+    .input-area input {
+      flex: 1;
+      padding: 0.6rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    .input-area button {
+      padding: 0.6rem 1rem;
+      border: none;
+      background: #2196f3;
+      color: #fff;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- HOME SCREEN -->
-<div id="home" class="screen active-screen">
-    <h2>Book Chapters</h2>
+  <header id="page-title">Home</header>
 
-    <div class="chapter-card">Chapter 1<br><small>A short preview text...</small></div>
-    <div class="chapter-card">Chapter 2<br><small>A short preview text...</small></div>
-    <div class="chapter-card">Chapter 3<br><small>A short preview text...</small></div>
-</div>
-
-<!-- CHATROOM SCREEN -->
-<div id="chatroom" class="screen">
-    <div id="chatMessages"></div>
-
-    <div class="chat-input">
-        <input type="text" id="chatMessageInput" placeholder="Type a message...">
-        <button onclick="sendMessage()">Send</button>
+  <!-- HOME SCREEN -->
+  <main id="home" class="active">
+    <div class="chapter-card" onclick="toggleChapter(1)">
+      <h3>Chapter 1: The Beginning</h3>
+      <p>Hello, I'm your teacher</p>
+      <div id="chapter1" class="chapter-content">Full Text: Hello, I'm your teacher. Welcome!</div>
     </div>
-</div>
 
-<!-- ABOUT SCREEN -->
-<div id="about" class="screen">
-    <h2>About This App</h2>
-    <p>This is a simple multi-screen mobile-friendly web app.</p>
-</div>
+    <div class="chapter-card" onclick="toggleChapter(2)">
+      <h3>Chapter 2: The Journey</h3>
+      <p>Fun</p>
+      <div id="chapter2" class="chapter-content">Full Text: This is the journey, full of fun!</div>
+    </div>
 
-<!-- BOTTOM NAVIGATION -->
-<div class="bottom-nav">
-    <button onclick="showScreen('home')">Home</button>
-    <button onclick="showScreen('chatroom')">Chat</button>
-    <button onclick="showScreen('about')">About</button>
-</div>
+    <div class="chapter-card" onclick="toggleChapter(3)">
+      <h3>Chapter 3: The End</h3>
+      <p>Goodbye</p>
+      <div id="chapter3" class="chapter-content">Full Text: Goodbye and best wishes!</div>
+    </div>
+  </main>
 
-<script>
-function showScreen(id) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
-    document.getElementById(id).classList.add('active-screen');
-}
+  <!-- ANNOUNCEMENTS SCREEN -->
+  <main id="announcements">
+    <h2>Announcements</h2>
+    <p style="margin-top: 1rem;">Your midterm exam is in one week!</p>
+  </main>
 
-/* --- CHAT FUNCTIONALITY --- */
-function sendMessage() {
-    const input = document.getElementById("chatMessageInput");
-    const text = input.value.trim();
-    if (!text) return;
+  <!-- CHATROOM SCREEN -->
+  <main id="chatroom">
+    <h2>Welcome to our Chatroom</h2>
 
-    const msg = document.createElement("div");
-    msg.className = "message";
-    msg.textContent = text;
+    <div class="chat-container">
+      <div class="messages" id="messages">
+        <div class="message">[Placeholder] Chat feature coming soon...</div>
+      </div>
 
-    const chatMessages = document.getElementById("chatMessages");
-    chatMessages.appendChild(msg);
+      <div class="input-area">
+        <input type="text" id="msgInput" placeholder="Type a message...">
+        <button onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+  </main>
 
-    input.value = "";
+  <!-- BOTTOM NAVIGATION -->
+  <nav>
+    <button id="nav-home" class="active" onclick="switchScreen('home')">
+      <span class="icon">🏠</span> Home
+    </button>
 
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-}
-</script>
+    <button id="nav-announcements" onclick="switchScreen('announcements')">
+      <span class="icon">📢</span> Announcements
+    </button>
 
+    <button id="nav-chatroom" onclick="switchScreen('chatroom')">
+      <span class="icon">💬</span> Chatroom
+    </button>
+  </nav>
+
+  <!-- JAVASCRIPT + FIREBASE -->
+  <script type="module">
+    import { initializeApp } 
+      from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getDatabase, ref, push, onValue } 
+      from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDoZzAt-G7OMDA_A_WQC7udTtKCPRUCoTw",
+      authDomain: "classchat2025-a2d96.firebaseapp.com",
+      databaseURL: "https://classchat2025-a2d96-default-rtdb.firebaseio.com",
+      projectId: "classchat2025-a2d96",
+      storageBucket: "classchat2025-a2d96.firebasestorage.app",
+      messagingSenderId: "673495831165",
+      appId: "1:673495831165:web:bebb70d1c51a3f21d31714"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const messagesRef = ref(db, "messages");
+
+    /* Switch Screens */
+    window.switchScreen = function(screen) {
+      document.querySelectorAll("main").forEach(m => m.classList.remove("active"));
+      document.getElementById(screen).classList.add("active");
+
+      document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
+      document.getElementById(`nav-${screen}`).classList.add("active");
+
+      document.getElementById("page-title").innerText =
+        screen.charAt(0).toUpperCase() + screen.slice(1);
+    };
+
+    /* Expand Chapter */
+    window.toggleChapter = function(num) {
+      const section = document.getElementById(`chapter${num}`);
+      section.classList.toggle("open");
+    };
+
+    /* Send Message */
+    const msgInput = document.getElementById("msgInput");
+    const messagesDiv = document.getElementById("messages");
+
+    window.sendMessage = function() {
+      const text = msgInput.value.trim();
+      if (text) {
+        push(messagesRef, { text });
+        msgInput.value = "";
+      }
+    };
+
+    /* Receive Messages */
+    onValue(messagesRef, snapshot => {
+      messagesDiv.innerHTML = "";
+      snapshot.forEach(child => {
+        const msg = document.createElement("div");
+        msg.className = "message";
+        msg.textContent = child.val().text;
+        messagesDiv.appendChild(msg);
+      });
+    });
+  </script>
 </body>
 </html>

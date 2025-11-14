@@ -2,11 +2,27 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
   <title>Class App</title>
+
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial', sans-serif; }
-    body { background: #f7f7f7; color: #333; display: flex; flex-direction: column; height: 100vh; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f7f7f7;
+      color: #333;
+      height: 100dvh; /* FIX: Correct dynamic mobile height */
+      display: flex;
+      flex-direction: column;
+      padding-bottom: env(safe-area-inset-bottom); /* Fix for iPhone safe area */
+    }
 
     header {
       text-align: center;
@@ -15,6 +31,7 @@
       font-size: 1.2rem;
       font-weight: bold;
       border-bottom: 1px solid #ddd;
+      z-index: 10;
     }
 
     main {
@@ -24,8 +41,11 @@
       display: none;
     }
 
-    main.active { display: block; }
+    main.active {
+      display: block;
+    }
 
+    /* Chapter card styling */
     .chapter-card {
       background: #fff;
       padding: 1rem;
@@ -33,10 +53,12 @@
       border-radius: 10px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: 0.3s ease;
     }
 
-    .chapter-card:hover { background: #f0f0f0; }
+    .chapter-card:hover {
+      background: #f0f0f0;
+    }
 
     .chapter-content {
       margin-top: 0.5rem;
@@ -46,28 +68,34 @@
       line-height: 1.4;
     }
 
-    .chapter-content.open { display: block; }
+    .chapter-content.open {
+      display: block;
+    }
 
-    /* Bottom Navigation */
+    /* Bottom Navigation FIXED, SAFE, ALWAYS VISIBLE */
     nav {
       display: flex;
       justify-content: space-around;
       background: #fff;
       border-top: 1px solid #ddd;
-      padding: 0.5rem 0;
+      padding: 0.6rem 0;
+      padding-bottom: env(safe-area-inset-bottom); /* MAIN FIX */
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      z-index: 999;
     }
 
     nav button {
       background: none;
       border: none;
-      outline: none;
       flex: 1;
       font-size: 0.9rem;
       color: #555;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
       cursor: pointer;
       transition: 0.2s;
     }
@@ -78,14 +106,14 @@
     }
 
     nav button span.icon {
-      font-size: 1.5rem;
+      font-size: 1.6rem;
     }
 
     /* Chatroom */
     .chat-container {
       display: flex;
       flex-direction: column;
-      height: calc(100vh - 120px);
+      height: calc(100dvh - 160px);
     }
 
     .messages {
@@ -127,70 +155,76 @@
     }
   </style>
 </head>
+
 <body>
+
   <header id="page-title">Home</header>
 
-  <!-- Home Screen -->
+  <!-- HOME SCREEN -->
   <main id="home" class="active">
     <div class="chapter-card" onclick="toggleChapter(1)">
       <h3>Chapter 1: The Beginning</h3>
       <p>Hello, I’m your teacher</p>
-      <div id="chapter1" class="chapter-content">Full Text: Hello, I’m your teacher. Welcome to this course!</div>
+      <div id="chapter1" class="chapter-content">Full Text: Hello, I’m your teacher. Welcome!</div>
     </div>
+
     <div class="chapter-card" onclick="toggleChapter(2)">
       <h3>Chapter 2: The Journey</h3>
       <p>Fun</p>
-      <div id="chapter2" class="chapter-content">Full Text: This is the journey, full of fun and learning!</div>
+      <div id="chapter2" class="chapter-content">Full Text: This is the journey, full of fun!</div>
     </div>
+
     <div class="chapter-card" onclick="toggleChapter(3)">
       <h3>Chapter 3: The End</h3>
       <p>Goodbye</p>
-      <div id="chapter3" class="chapter-content">Full Text: Goodbye and best wishes for your future!</div>
+      <div id="chapter3" class="chapter-content">Full Text: Goodbye and best wishes!</div>
     </div>
   </main>
 
-  <!-- Announcements Screen -->
+  <!-- ANNOUNCEMENTS SCREEN -->
   <main id="announcements">
     <h2>Announcements</h2>
-    <p style="margin-top:1rem;">Your midterm exam is in one week!</p>
+    <p style="margin-top: 1rem;">Your midterm exam is in one week!</p>
   </main>
 
-  <!-- Chatroom Screen -->
+  <!-- CHATROOM SCREEN -->
   <main id="chatroom">
     <h2>Welcome to our Chatroom</h2>
+
     <div class="chat-container">
       <div class="messages" id="messages">
         <div class="message">[Placeholder] Chat feature coming soon...</div>
       </div>
+
       <div class="input-area">
-        <input type="text" id="msgInput" placeholder="Type a message..." />
+        <input type="text" id="msgInput" placeholder="Type a message...">
         <button onclick="sendMessage()">Send</button>
       </div>
     </div>
   </main>
 
-  <!-- Bottom Navigation -->
+  <!-- BOTTOM NAVIGATION -->
   <nav>
     <button id="nav-home" class="active" onclick="switchScreen('home')">
-      <span class="icon">🏠</span>
-      Home
+      <span class="icon">🏠</span> Home
     </button>
+
     <button id="nav-announcements" onclick="switchScreen('announcements')">
-      <span class="icon">📢</span>
-      Announcements
+      <span class="icon">📢</span> Announcements
     </button>
+
     <button id="nav-chatroom" onclick="switchScreen('chatroom')">
-      <span class="icon">💬</span>
-      Chatroom
+      <span class="icon">💬</span> Chatroom
     </button>
   </nav>
 
+  <!-- JAVASCRIPT + FIREBASE -->
   <script type="module">
-    // Import Firebase
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+    import { initializeApp } 
+      from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getDatabase, ref, push, onValue } 
+      from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
-    // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyDoZzAt-G7OMDA_A_WQC7udTtKCPRUCoTw",
       authDomain: "classchat2025-a2d96.firebaseapp.com",
@@ -205,7 +239,7 @@
     const db = getDatabase(app);
     const messagesRef = ref(db, "messages");
 
-    // Switch between screens
+    /* Switch Screens */
     window.switchScreen = function(screen) {
       document.querySelectorAll("main").forEach(m => m.classList.remove("active"));
       document.getElementById(screen).classList.add("active");
@@ -215,15 +249,15 @@
 
       document.getElementById("page-title").innerText =
         screen.charAt(0).toUpperCase() + screen.slice(1);
-    }
+    };
 
-    // Toggle chapter content
+    /* Expand Chapter */
     window.toggleChapter = function(num) {
-      const content = document.getElementById(`chapter${num}`);
-      content.classList.toggle("open");
-    }
+      const section = document.getElementById(`chapter${num}`);
+      section.classList.toggle("open");
+    };
 
-    // Basic Firebase chat placeholder
+    /* Send Message */
     const msgInput = document.getElementById("msgInput");
     const messagesDiv = document.getElementById("messages");
 
@@ -233,9 +267,9 @@
         push(messagesRef, { text });
         msgInput.value = "";
       }
-    }
+    };
 
-    // Listen for new messages
+    /* Receive Messages */
     onValue(messagesRef, snapshot => {
       messagesDiv.innerHTML = "";
       snapshot.forEach(child => {
